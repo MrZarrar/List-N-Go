@@ -6,17 +6,14 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
-let browserPool = []; // Browser pool
+let browser;
+const browserPool = []; // Browser pool
 
 (async () => {
     // Launch multiple browser instances for pooling
-    for (let i = 0; i < 2; i++) { // Adjust the number of instances as needed
-        try {
-            const b = await puppeteer.launch({ headless: true });
-            browserPool.push(b);
-        } catch (error) {
-            console.error('Error launching browser:', error.message);
-        }
+    for (let i = 0; i < 2; i++) { // Adjust number of instances as needed
+        const b = await puppeteer.launch({ headless: true });
+        browserPool.push(b);
     }
 })();
 
@@ -80,7 +77,6 @@ const getPriceFromAsda = async (item) => {
     }
 };
 
-// Function to scrape price from Sainsburys
 const getPriceFromSainsburys = async (item) => {
     const url = `https://www.sainsburys.co.uk/gol-ui/SearchResults/${encodeURIComponent(item)}`;
 
@@ -136,7 +132,7 @@ const getPriceFromSainsburys = async (item) => {
     }
 };
 
-// Function to scrape price from Tesco
+
 const getPriceFromTesco = async (item) => {
     const url = `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(item)}&inputType=free+text/`;
 
@@ -192,7 +188,8 @@ const getPriceFromTesco = async (item) => {
     }
 };
 
-// Post route to get the price
+
+
 app.post('/get-price', async (req, res) => {
     const { store, item } = req.body;
 
@@ -233,13 +230,11 @@ app.post('/get-price', async (req, res) => {
     }
 });
 
-// Gracefully close browser instances when the server shuts down
-process.on('SIGINT', async () => {
-    console.log('Shutting down server...');
-    if (browserPool.length > 0) {
+// Close browser instances when the server shuts down
+process.on('exit', async () => {
+    if (browser) {
         await Promise.all(browserPool.map(b => b.close()));
     }
-    process.exit();
 });
 
 app.listen(port, () => {
