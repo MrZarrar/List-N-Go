@@ -1,0 +1,216 @@
+/* Remove the focus outline (blue highlight) */
+input:focus, select:focus {
+    outline: none;
+}
+
+/* Center the entire container on the page */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #1f242d;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+}
+
+/* Container for the shopping app */
+.container {
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    padding: 2rem;
+    background: #323946;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Style the input fields, select, and buttons */
+input, select, button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.6rem;
+    border: none;
+    border-radius: 5px;
+    background: #1f242d;
+    color: #fff;
+}
+
+/* Center the text inside the select dropdown */
+select {
+    color: #00eeff;
+    background-color: #1f242d;
+    text-align: center;
+    text-align-last: center;
+}
+
+/* Wrap the item and quantity fields in a flex container */
+.input-group {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+#item {
+    flex: 3;
+    text-align: center;
+}
+
+#quantity {
+    flex: 1;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+button {
+    background: #0ef;
+    color: #323946;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+    padding: 1rem 1.8rem;
+    border-radius: 5rem;
+    box-shadow: 0 0 1rem #0ef;
+    font-size: 1.6rem;
+    transition: 0.5s ease;
+}
+
+button:hover {
+    box-shadow: none;
+}
+
+/* Shopping list styling */
+.shopping-list {
+    text-align: left;
+    background: #1f242d;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+/* Individual list item styling */
+.shopping-list li {
+    list-style: none;
+    background: #323946;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+}
+
+.shopping-list li span {
+    flex: 1;
+    word-wrap: break-word;
+}
+
+/* Checkbox styling */
+.shopping-list li input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #00eeff;
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+/* Total price styling */
+#totalPrice {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+/* Style the checkbox to make it circular, larger, and change color */
+.item-checkbox {
+    -webkit-appearance: none; /* Safari/Chrome */
+    -moz-appearance: none; /* Firefox */
+    appearance: none; /* General */
+    width: 24px; /* Adjust the size */
+    height: 24px;
+    border: 2px solid #00eeff; /* Border color */
+    border-radius: 50%; /* Circular shape */
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition for hover/focus states */
+}
+
+
+.item-checkbox:checked {
+    background-color: #00eeff; /* Change the background color when checked */
+    border: 2px solid #00eeff; /* Keep the same border color */
+}
+
+.item-checkbox:hover {
+    box-shadow: 0 0 6px #00eeff; /* Add a glowing effect on hover */
+}
+
+
+/* For Chrome, Safari, and Edge */
+::-webkit-scrollbar {
+    width: 12px; /* Set the width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #2e3b4e; /* Darker background color for the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #00eeff; /* Color of the draggable thumb */
+    border-radius: 10px; /* Rounded edges for the thumb */
+    border: 3px solid #2e3b4e; /* Border color for the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0099cc; /* Darker color on hover */
+}
+
+::-webkit-scrollbar-button {
+    display: none; /* Hide the default buttons on the scrollbar */
+}
+
+/* Style the quantity input */
+#quantity {
+    width: 60px;
+    padding: 5px;
+    font-size: 25px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+}
+
+/* Remove the default up/down arrows */
+#quantity::-webkit-outer-spin-button,
+#quantity::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Add custom buttons for increment and decrement */
+#quantity::-webkit-outer-spin-button,
+#quantity::-webkit-inner-spin-button {
+    -webkit-appearance: button-bevel;
+    background-color: #00eeff;
+    border-radius: 2px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+#quantity:focus {
+    outline: none;
+    border-color: #00eeff;
+}
+

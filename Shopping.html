@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Shopping List</h1>
+    <select id="store">
+        <option value="asda">Asda</option>
+        <option value="sainsburys">Sainsbury's</option>
+        <option value="tesco">Tesco</option>
+    </select>
+
+    <div class="input-group">
+        <input type="text" id="item" placeholder="Enter item">
+        <input type="number" id="quantity" placeholder="Qty" value="1" min="1">
+    </div>
+    <div class="buttons">
+        <button id="addItem">Add Item</button>
+        <button id="resetList">Reset List</button>
+    </div>
+    <ul id="shoppingList" class="shopping-list"></ul>
+    <div id="totalPrice">£0.00</div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
