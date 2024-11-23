@@ -12,7 +12,14 @@ const browserPool = []; // Browser pool
 (async () => {
     // Launch multiple browser instances for pooling
     for (let i = 0; i < 2; i++) { // Adjust number of instances as needed
-        const b = await puppeteer.launch({ headless: true });
+        const b = await puppeteer.launch({ headless: true, args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--window-size=1920,1080',
+                '--single-process'
+            ] });
         browserPool.push(b);
     }
 })();
