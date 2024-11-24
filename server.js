@@ -2,6 +2,7 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 const compression = require('compression');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,6 +26,9 @@ const cache = new Map();
 app.use(cors());
 app.use(compression());
 app.use(express.json());
+
+// Serve static files from the root directory
+app.use(express.static(path.join(__dirname)));
 
 // Utility to add a delay (replaces waitForTimeout)
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
