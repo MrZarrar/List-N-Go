@@ -4,8 +4,7 @@ const compression = require('compression');
 const cors = require('cors');
 
 // Use environment variable or Render-specific Chrome path
-const pathToChromium = process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/mac_arm-131.0.6778.85/chrome';
-
+const pathToChromium = process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/linux-xxxx/Google Chrome for Testing';
 const app = express();
 const port = process.env.PORT || 3000;
 
