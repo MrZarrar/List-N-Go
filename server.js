@@ -3,24 +3,36 @@ const puppeteer = require('puppeteer');
 const compression = require('compression');
 const cors = require('cors');
 
+// Use environment variable or Render-specific Chrome path
+const pathToChromium = process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/mac_arm-131.0.6778.85/chrome';
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-let browser;
-const browserPool = []; // Browser pool
+const browserPool = []; // Browser pool for managing multiple instances
 
+// Launch multiple browser instances for pooling
 (async () => {
-    // Launch multiple browser instances for pooling
-    for (let i = 0; i < 2; i++) { // Adjust number of instances as needed
-        const b = await puppeteer.launch({ headless: true, args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--window-size=1920,1080',
-                '--single-process'
-            ] });
-        browserPool.push(b);
+    try {
+        for (let i = 0; i < 2; i++) { // Adjust number of instances as needed
+            const browser = await puppeteer.launch({
+                executablePath: pathToChromium,
+                headless: true,
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                    '--window-size=1920,1080',
+                    '--single-process'
+                ]
+            });
+            browserPool.push(browser);
+        }
+        console.log('Browser pool initialized.');
+    } catch (error) {
+        console.error('Error initializing browser pool:', error.message);
+        process.exit(1); // Prevent the server from starting without browser instances
     }
 })();
 
