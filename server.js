@@ -28,7 +28,11 @@ app.use(compression());
 app.use(express.json());
 
 // Serve static files from the root directory
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.resolve(__dirname)));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'Shopping.html'));
+});
 
 // Utility to add a delay (replaces waitForTimeout)
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
