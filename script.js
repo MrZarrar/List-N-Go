@@ -93,16 +93,22 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('item').focus(); // Refocus on the item input
 
     try {
-        const apiUrl = window.location.origin;  // Uses the current domain
-        const response = await fetch(`${apiUrl}/get-price`,  {
+        const API_URL = 'https://listngo.onrender.com/get-price'; // Hardcoded Render URL
+
+        console.log(`Making request to: ${API_URL}`); // Debugging log for endpoint
+
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),
         });
 
-        const data = await response.json();
+        console.log('Response status:', response.status); // Debugging log for response status
 
         if (response.ok) {
+            const data = await response.json();
+            console.log('Received data:', data); // Debugging log for response data
+
             const price = parseFloat(data.price);
             if (isNaN(price)) {
                 showNotification('Invalid price received from server.');
@@ -111,11 +117,12 @@ document.getElementById('addItem').addEventListener('click', async function () {
 
             addItemToList(item, quantity, price);
         } else {
+            const data = await response.json();
             showNotification(data.error || 'An error occurred.');
         }
     } catch (error) {
         showNotification('Error fetching price. Please try again later - host issue.');
-        console.error(error);
+        console.error('Error during fetch:', error);
     }
 });
 
