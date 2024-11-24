@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     lsb-release \
     xdg-utils \
+    chromium \
     --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -30,5 +31,9 @@ COPY . .
 # Expose the port (replace with your app's port)
 EXPOSE 8080
 
+# Set the environment variable to specify the path to Chromium (in case needed)
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 # Start the app
 CMD ["node", "server.js"]
+
