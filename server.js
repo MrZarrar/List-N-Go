@@ -168,7 +168,7 @@ const getPriceFromTesco = async (item) => {
         await page.waitForSelector('.ddsweb-buybox__price', { timeout: 100000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
-        await delay(100);
+        await delay(1000);
 
         // Limit scraping to necessary data (price)
         const productData = await page.evaluate(() => {
