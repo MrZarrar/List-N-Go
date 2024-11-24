@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.static(path.resolve(__dirname)));
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'Shopping.html'));
+    res.sendFile(path.join(__dirname, 'Shopping.html'));
 });
 
 // Utility to add a delay
