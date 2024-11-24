@@ -27,7 +27,7 @@ const launchBrowser = async () => {
             process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer.executablePath(),
-        headless: false, // Set to false for debugging
+        headless: true, // Set to false for debugging
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -56,9 +56,9 @@ const getPriceFromAsda = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Timeout set to 1 minute
         console.log('Asda page loaded');
-        await page.waitForSelector('.co-item', { timeout: 100000 });
+        await page.waitForSelector('.co-item', { timeout: 60000 }); // Timeout set to 1 minute
         await delay(100); // Wait for content to load
 
         const productData = await page.evaluate(() => {
@@ -101,9 +101,9 @@ const getPriceFromSainsburys = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Timeout set to 1 minute
         console.log('Sainsburys page loaded');
-        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 100000 });
+        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 60000 }); // Timeout set to 1 minute
         await delay(100);
 
         const productData = await page.evaluate(() => {
@@ -147,9 +147,9 @@ const getPriceFromTesco = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Timeout set to 1 minute
         console.log('Tesco page loaded');
-        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 100000 });
+        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 60000 }); // Timeout set to 1 minute
         await delay(100);
 
         const productData = await page.evaluate(() => {
