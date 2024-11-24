@@ -55,8 +55,8 @@ const getPriceFromAsda = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 4000 });
-        await page.waitForSelector('.co-item', { timeout: 5000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.waitForSelector('.co-item', { timeout: 10000 });
         await delay(100); // Wait for content to load
 
         const productData = await page.evaluate(() => {
@@ -98,8 +98,8 @@ const getPriceFromSainsburys = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 2000 });
-        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 5000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 10000 });
         await delay(100);
 
         const productData = await page.evaluate(() => {
@@ -142,8 +142,8 @@ const getPriceFromTesco = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 4000 });
-        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 5000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 10000 });
         await delay(100);
 
         const productData = await page.evaluate(() => {
@@ -221,3 +221,4 @@ app.listen(port, () => {
 });
 
 console.log('Current working directory:', __dirname);
+console.error('Scraping error:', error.message, error.stack);
