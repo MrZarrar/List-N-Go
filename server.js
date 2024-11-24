@@ -7,19 +7,25 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 8080;
 
-let browserPool = []; // Browser pool
+let browser; // Single browser instance
 
 (async () => {
-    // Launch multiple browser instances for pooling
-    for (let i = 0; i < 2; i++) { // Adjust the number of instances as needed
-        try {
-            const b = await puppeteer.launch({ headless: true });
-            browserPool.push(b);
-        } catch (error) {
-            console.error('Error launching browser:', error.message);
-        }
+    try {
+        // Launch a single browser instance
+        browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',        // Run without sandbox (required for Cloud Run)
+                '--disable-setuid-sandbox', // Disable the setuid sandbox (required for Cloud Run)
+                '--disable-dev-shm-usage', // Disable shared memory usage (required for Cloud Run)
+                '--remote-debugging-port=9222', // Allow debugging (optional)
+            ],
+            executablePath: process.env.CHROME_BIN || '/usr/bin/chromium-browser', // Ensure the correct executable path
+        });
+        console.log('Browser instance initialized');
+    } catch (error) {
+        console.error('Error launching browser:', error.message);
     }
-    console.log('Browser pool initialized with', browserPool.length, 'instances');
 })();
 
 const cache = new Map();
@@ -41,9 +47,6 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 // Function to scrape price from Asda
 const getPriceFromAsda = async (item) => {
     const url = `https://groceries.asda.com/search/${encodeURIComponent(item)}`;
-
-    // Get a browser from the pool
-    const browser = browserPool[Math.floor(Math.random() * browserPool.length)];
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -92,9 +95,6 @@ const getPriceFromAsda = async (item) => {
 // Function to scrape price from Sainsburys
 const getPriceFromSainsburys = async (item) => {
     const url = `https://www.sainsburys.co.uk/gol-ui/SearchResults/${encodeURIComponent(item)}`;
-
-    // Get a browser from the pool
-    const browser = browserPool[Math.floor(Math.random() * browserPool.length)];
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -145,9 +145,6 @@ const getPriceFromSainsburys = async (item) => {
 // Function to scrape price from Tesco
 const getPriceFromTesco = async (item) => {
     const url = `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(item)}&inputType=free+text/`;
-
-    // Get a browser from the pool
-    const browser = browserPool[Math.floor(Math.random() * browserPool.length)];
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -241,15 +238,15 @@ app.post('/get-price', async (req, res) => {
     }
 });
 
-// Gracefully close browser instances when the server shuts down
+// Gracefully close browser instance when the server shuts down
 process.on('SIGINT', async () => {
-    console.log('Shutting down server...');
-    if (browserPool.length > 0) {
-        await Promise.all(browserPool.map(b => b.close()));
+    if (browser) {
+        await browser.close();
+        console.log('Browser instance closed');
     }
     process.exit();
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on port ${port}`);
 });
