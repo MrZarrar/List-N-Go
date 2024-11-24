@@ -14,10 +14,10 @@ app.use(cors());
 app.use(compression());
 app.use(express.json());
 
-// Serve static files from the 'build' directory (or your public directory)
-app.use(express.static(path.resolve(__dirname)));  // Adjust if your frontend is in a different folder
+// Serve static files from the current directory
+app.use(express.static(path.resolve(__dirname)));
 
-// Utility to add a delay (replaces waitForTimeout)
+// Utility to add a delay
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to launch a new browser instance
@@ -27,7 +27,7 @@ const launchBrowser = async () => {
             process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer.executablePath(),
-        headless: true, // Set to false for debugging
+        headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -41,23 +41,22 @@ const launchBrowser = async () => {
 const getPriceFromAsda = async (item) => {
     const url = `https://groceries.asda.com/search/${encodeURIComponent(item)}`;
 
-    const browser = await launchBrowser(); // Launch a new browser instance
+    const browser = await launchBrowser();
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
-    // Intercept requests and block unnecessary resources (e.g., images)
     page.on('request', (req) => {
         if (['image', 'font', 'media'].includes(req.resourceType())) {
-            req.abort(); // Abort non-essential requests like images
+            req.abort();
         } else {
-            req.continue(); // Continue with other requests
+            req.continue();
         }
     });
 
     try {
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
         await page.waitForSelector('.co-item', { timeout: 10000 });
-        await delay(100); // Wait for content to load
+        await delay(100);
 
         const productData = await page.evaluate(() => {
             const product = document.querySelector('.co-item');
@@ -74,10 +73,10 @@ const getPriceFromAsda = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error:', error.message);
+        console.error('Scraping error (Asda):', error.message, error.stack);
         return null;
     } finally {
-        await browser.close(); // Close the browser after each request
+        await browser.close();
     }
 };
 
@@ -85,7 +84,7 @@ const getPriceFromAsda = async (item) => {
 const getPriceFromSainsburys = async (item) => {
     const url = `https://www.sainsburys.co.uk/gol-ui/SearchResults/${encodeURIComponent(item)}`;
 
-    const browser = await launchBrowser(); // Launch a new browser instance
+    const browser = await launchBrowser();
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -118,7 +117,7 @@ const getPriceFromSainsburys = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error:', error.message);
+        console.error('Scraping error (Sainsburys):', error.message, error.stack);
         return null;
     } finally {
         await browser.close();
@@ -129,7 +128,7 @@ const getPriceFromSainsburys = async (item) => {
 const getPriceFromTesco = async (item) => {
     const url = `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(item)}&inputType=free+text/`;
 
-    const browser = await launchBrowser(); // Launch a new browser instance
+    const browser = await launchBrowser();
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -162,7 +161,7 @@ const getPriceFromTesco = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error:', error.message);
+        console.error('Scraping error (Tesco):', error.message, error.stack);
         return null;
     } finally {
         await browser.close();
@@ -206,19 +205,16 @@ app.post('/get-price', async (req, res) => {
         cache.set(cacheKey, price);
         res.json({ price });
     } catch (error) {
-        console.error('Error processing request:', error.message);
+        console.error('Error processing request:', error.message, error.stack);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
-// Serve index.html for any route that doesn't match an API endpoint
+// Serve index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'Shopping.html'));  // Adjust if needed
+    res.sendFile(path.resolve(__dirname, 'Shopping.html'));
 });
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-console.log('Current working directory:', __dirname);
-console.error('Scraping error:', error.message, error.stack);
