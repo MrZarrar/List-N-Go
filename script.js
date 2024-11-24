@@ -99,7 +99,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
 
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', },
             body: JSON.stringify({ store, item }),
         });
 
