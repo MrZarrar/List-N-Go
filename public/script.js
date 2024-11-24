@@ -77,6 +77,7 @@ document.getElementById('resetList').addEventListener('click', function () {
 });
 
 // Add an item when the "Add Item" button is clicked
+// Add an item when the "Add Item" button is clicked
 document.getElementById('addItem').addEventListener('click', async function () {
     const store = document.getElementById('store').value;
     const item = document.getElementById('item').value.trim();
@@ -92,7 +93,8 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('quantity').value = '1';
     document.getElementById('item').focus(); // Refocus on the item input
 
-    const backendUrl = process.env.BACKEND_API_URL || 'http://localhost:3000';  // Default to localhost if no environment variable
+    // Manually set the backend URL to your production URL
+    const backendUrl = 'https://list-n-go-232454279663.us-central1.run.app';
 
     try {
         const response = await fetch(`${backendUrl}/get-price`, {
