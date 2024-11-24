@@ -2,8 +2,8 @@ const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const cors = require('cors'); // Importing the CORS package
+
 const app = express();
-const port = 3000;
 
 // Use CORS middleware
 app.use(cors()); // This will enable CORS for all routes
@@ -100,6 +100,11 @@ app.get('/get-price', async (req, res) => {
     return res.json({ price });
 });
 
+// Use dynamic port assignment for Vercel deployment
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+// Export the app for Vercel serverless functions
+module.exports = app;

@@ -1,5 +1,5 @@
-// Determine the API URL based on the environment variable
-const apiUrl = 'https://listngo-qv1c5l2tl-mrzarrars-projects.vercel.app/get-price';  // Fallback to local if no env var
+// Determine the API URL based on the environment
+const apiUrl = window.location.origin + '/api/get-price'; // Dynamically build the API URL for Vercel
 
 // Save the shopping list and total price to Local Storage
 function saveToLocalStorage() {
@@ -25,11 +25,11 @@ function loadFromLocalStorage() {
                 const listItem = checkbox.closest('li');
                 listItem.style.textDecoration = checkbox.checked ? 'line-through' : 'none';
                 saveToLocalStorage();
-                reorderItems();  // Ensure the list is reordered when a checkbox is clicked
+                reorderItems(); // Ensure the list is reordered when a checkbox is clicked
             });
         });
 
-        reorderItems();  // Ensure the list is ordered after loading from localStorage
+        reorderItems(); // Ensure the list is ordered after loading from localStorage
     }
 
     if (savedTotal) {
@@ -56,7 +56,7 @@ function addItemToList(item, quantity, price) {
     checkbox.addEventListener('change', function () {
         listItem.style.textDecoration = checkbox.checked ? 'line-through' : 'none';
         saveToLocalStorage();
-        reorderItems();  // Ensure the list is reordered when a checkbox is clicked
+        reorderItems(); // Ensure the list is reordered when a checkbox is clicked
     });
 
     shoppingList.appendChild(listItem);
@@ -69,7 +69,7 @@ function addItemToList(item, quantity, price) {
     // Save to Local Storage
     saveToLocalStorage();
 
-    reorderItems();  // Reorder items when a new one is added
+    reorderItems(); // Reorder items when a new one is added
 }
 
 // Reset the shopping list
@@ -97,8 +97,9 @@ document.getElementById('addItem').addEventListener('click', async function () {
 
     try {
         const response = await fetch(apiUrl, { // Use the dynamic API URL
-            method: 'POST',
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
+            // Pass store and item as query parameters
             body: JSON.stringify({ store, item }),
         });
 
@@ -147,7 +148,6 @@ function showNotification(message) {
 
 // Load saved data when the page loads
 document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
-
 
 // Function to reorder items based on checked state
 function reorderItems() {
