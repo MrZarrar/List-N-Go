@@ -15,6 +15,10 @@ app.use(compression());
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname)));
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'Shopping.html'));
+});
+
 // Utility to add a delay
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
