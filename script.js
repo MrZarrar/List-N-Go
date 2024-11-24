@@ -146,7 +146,6 @@ function showNotification(message) {
 // Load saved data when the page loads
 document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
 
-
 // Function to reorder items based on checked state
 function reorderItems() {
     const list = document.getElementById('shoppingList'); // Updated to use the correct list container

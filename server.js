@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+console.log('Files in the project directory:', fs.readdirSync(__dirname));
 const puppeteer = require('puppeteer');
 require("dotenv").config();
 const compression = require('compression');
@@ -6,7 +8,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(compression());
@@ -25,9 +27,13 @@ const launchBrowser = async () => {
             process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer.executablePath(),
-        headless: true // Set to false for debugging
-
-
+        headless: true, // Set to false for debugging
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--single-process',
+            '--no-zygote',
+        ]
     });
 };
 
