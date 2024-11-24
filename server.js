@@ -28,7 +28,7 @@ app.use(compression());
 app.use(express.json());
 
 // Serve static files from the root directory
-app.use(express.static(path.resolve(__dirname)));
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'Shopping.html'));
