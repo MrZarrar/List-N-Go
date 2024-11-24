@@ -1,6 +1,6 @@
 // Determine the API URL based on the environment (local or production)
 const apiUrl = process.env.NODE_ENV === 'production'
-    ? 'https://listngo-mrzarrars-projects.vercel.app/'  // Replace with your production URL
+    ? 'https://listngo-mrzarrars-projects.vercel.app'  // Replace with your production URL
     : 'http://localhost:3000';  // Local URL for development
 
 // Save the shopping list and total price to Local Storage
@@ -98,7 +98,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('item').focus(); // Refocus on the item input
 
     try {
-        const response = await fetch(`${apiUrl}/get-price`, { // Use dynamic API URL
+        const response = await fetch(`${apiUrl}/api/get-price`, { // Use dynamic API URL
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),
@@ -149,7 +149,6 @@ function showNotification(message) {
 
 // Load saved data when the page loads
 document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
-
 
 // Function to reorder items based on checked state
 function reorderItems() {
