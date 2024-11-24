@@ -213,7 +213,7 @@ app.post('/get-price', async (req, res) => {
 
 // Serve index.html for any route that doesn't match an API endpoint
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'shopping.html'));  // Adjust if needed
+    res.sendFile(path.resolve(__dirname, 'Shopping.html'));  // Adjust if needed
 });
 
 app.listen(port, () => {
