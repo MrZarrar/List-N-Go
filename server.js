@@ -19,6 +19,7 @@ let browserPool = []; // Browser pool
             console.error('Error launching browser:', error.message);
         }
     }
+    console.log('Browser pool initialized with', browserPool.length, 'instances');
 })();
 
 const cache = new Map();
@@ -57,10 +58,10 @@ const getPriceFromAsda = async (item) => {
 
     try {
         // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 4000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
 
         // Wait for the product listing to load
-        await page.waitForSelector('.co-item', { timeout: 5000 });
+        await page.waitForSelector('.co-item', { timeout: 10000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
         await delay(100);
@@ -81,7 +82,7 @@ const getPriceFromAsda = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error:', error.message);
+        console.error('Scraping error from Asda:', error.message);
         return null;
     } finally {
         await page.close();
@@ -108,25 +109,22 @@ const getPriceFromSainsburys = async (item) => {
 
     try {
         // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 2000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
 
         // Wait for the price container to load
-        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 5000 });
+        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 10000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
         await delay(100);
 
         // Limit scraping to necessary data (price)
         const productData = await page.evaluate(() => {
-            // Select the price container for the first product
             const priceContainer = document.querySelector('.pt__cost__retail-price__wrapper');
             if (!priceContainer) return { price: null };
 
-            // Select the price text element within the container
             const priceElement = priceContainer.querySelector('.pt__cost__retail-price');
             const priceText = priceElement ? priceElement.textContent.trim() : null;
 
-            // Extract numeric value from the price text
             if (priceText) {
                 const numericPrice = priceText.replace(/[^\d.]/g, ''); // Removes £ and non-numeric characters
                 return { price: parseFloat(numericPrice) }; // Converts to a float
@@ -137,7 +135,7 @@ const getPriceFromSainsburys = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error:', error.message);
+        console.error('Scraping error from Sainsburys:', error.message);
         return null;
     } finally {
         await page.close();
@@ -164,25 +162,22 @@ const getPriceFromTesco = async (item) => {
 
     try {
         // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 4000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
 
         // Wait for the product price container to load
-        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 5000 });
+        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 10000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
         await delay(100);
 
         // Limit scraping to necessary data (price)
         const productData = await page.evaluate(() => {
-            // Select the price container for the first product
             const priceContainer = document.querySelector('.ddsweb-buybox__price');
             if (!priceContainer) return { price: null };
 
-            // Select the price text element within the container
             const priceElement = priceContainer.querySelector('.styled__PriceText-sc-v0qv7n-1');
             const priceText = priceElement ? priceElement.textContent.trim() : null;
 
-            // Extract numeric value from the price text
             if (priceText) {
                 const numericPrice = priceText.replace(/[^\d.]/g, ''); // Removes £ and non-numeric characters
                 return { price: parseFloat(numericPrice) }; // Converts to a float
@@ -193,7 +188,7 @@ const getPriceFromTesco = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error:', error.message);
+        console.error('Scraping error from Tesco:', error.message);
         return null;
     } finally {
         await page.close();
@@ -205,15 +200,18 @@ app.post('/get-price', async (req, res) => {
     const { store, item } = req.body;
 
     if (!store || !item) {
+        console.error('Store and item are required.');
         return res.status(400).json({ error: 'Store and item are required.' });
     }
 
     const cacheKey = `${store}-${item.toLowerCase()}`;
     if (cache.has(cacheKey)) {
+        console.log(`Cache hit for ${store}-${item}`);
         return res.json({ price: cache.get(cacheKey) });
     }
 
     try {
+        console.log(`Scraping price for ${store} - ${item}`);
         let price;
         switch (store) {
             case 'asda':
@@ -230,10 +228,12 @@ app.post('/get-price', async (req, res) => {
         }
 
         if (price === null || isNaN(price)) {
+            console.error(`Invalid price received for ${store}-${item}:`, price);
             return res.status(500).json({ error: 'Invalid price received from scraper.' });
         }
 
         cache.set(cacheKey, price);
+        console.log(`Price scraped for ${store}-${item}: ${price}`);
         res.json({ price });
     } catch (error) {
         console.error('Error processing request:', error.message);
