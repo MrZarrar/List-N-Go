@@ -30,7 +30,7 @@ app.use(express.json());
 // Serve static files from the root directory
 app.use(express.static(path.resolve(__dirname)));
 
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'Shopping.html'));
 });
 
