@@ -13,11 +13,10 @@
     "express": "^4.21.1",
     "puppeteer": "^23.9.0"
   },
+  "devDependencies": {
+  },
   "engines": {
     "node": "18.x"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "license": "ISC"
 }

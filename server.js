@@ -30,8 +30,8 @@ app.use(express.json());
 // Serve static files from the root directory
 app.use(express.static(path.resolve(__dirname, 'public')));
 
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'Shopping.html'));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'Shopping.html'));
 });
 
 // Utility to add a delay (replaces waitForTimeout)
@@ -253,5 +253,3 @@ process.on('SIGINT', async () => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-//change this
