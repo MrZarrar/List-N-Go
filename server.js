@@ -8,7 +8,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(compression());
@@ -21,18 +21,21 @@ app.use(express.static(path.resolve(__dirname)));  // Adjust if your frontend is
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to launch a new browser instance
+
 const launchBrowser = async () => {
+    const executablePath = process.env.NODE_ENV === 'production'
+        ? process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable'  // Default path
+        : puppeteer.executablePath();
+
     return await puppeteer.launch({
-        executablePath:
-            process.env.NODE_ENV === "production"
-                ? process.env.PUPPETEER_EXECUTABLE_PATH
-                : puppeteer.executablePath(),
-        headless: true, // Set to false for debugging
+        executablePath,
+        headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--single-process',
             '--no-zygote',
+            '--disable-dev-shm-usage',
         ]
     });
 };
@@ -233,3 +236,5 @@ app.listen(port, () => {
 });
 
 console.log('Current working directory:', __dirname);
+
+console.log(`Using Chrome path: ${process.env.PUPPETEER_EXECUTABLE_PATH || 'Default path'}`);
