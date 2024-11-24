@@ -27,7 +27,7 @@ const launchBrowser = async () => {
             process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer.executablePath(),
-        headless: true, // Set to false for debugging
+        headless: false, // Set to false for debugging
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
