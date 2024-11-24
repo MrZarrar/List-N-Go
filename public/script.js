@@ -1,5 +1,5 @@
 // Determine the API URL based on the environment variable
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://listngo-mrzarrars-projects.vercel.app/get-price';  // Fallback to local if no env var
+const apiUrl = 'https://listngo-mrzarrars-projects.vercel.app/get-price';  // Fallback to local if no env var
 
 // Save the shopping list and total price to Local Storage
 function saveToLocalStorage() {
