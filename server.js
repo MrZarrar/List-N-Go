@@ -14,10 +14,10 @@ app.use(cors());
 app.use(compression());
 app.use(express.json());
 
-// Serve static files from the current directory
-app.use(express.static(path.resolve(__dirname)));
+// Serve static files from the 'build' directory (or your public directory)
+app.use(express.static(path.resolve(__dirname)));  // Adjust if your frontend is in a different folder
 
-// Utility to add a delay
+// Utility to add a delay (replaces waitForTimeout)
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to launch a new browser instance
@@ -27,7 +27,7 @@ const launchBrowser = async () => {
             process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer.executablePath(),
-        headless: true,
+        headless: true, // Set to false for debugging
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -40,23 +40,26 @@ const launchBrowser = async () => {
 // Function to scrape price from Asda
 const getPriceFromAsda = async (item) => {
     const url = `https://groceries.asda.com/search/${encodeURIComponent(item)}`;
+    console.log(`Starting Asda scrape for item: ${item}`);
 
-    const browser = await launchBrowser();
+    const browser = await launchBrowser(); // Launch a new browser instance
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
+    // Intercept requests and block unnecessary resources (e.g., images)
     page.on('request', (req) => {
         if (['image', 'font', 'media'].includes(req.resourceType())) {
-            req.abort();
+            req.abort(); // Abort non-essential requests like images
         } else {
-            req.continue();
+            req.continue(); // Continue with other requests
         }
     });
 
     try {
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        console.log('Asda page loaded');
         await page.waitForSelector('.co-item', { timeout: 10000 });
-        await delay(100);
+        await delay(100); // Wait for content to load
 
         const productData = await page.evaluate(() => {
             const product = document.querySelector('.co-item');
@@ -73,18 +76,19 @@ const getPriceFromAsda = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error (Asda):', error.message, error.stack);
+        console.error('Asda scraping error:', error.message);
         return null;
     } finally {
-        await browser.close();
+        await browser.close(); // Close the browser after each request
     }
 };
 
 // Function to scrape price from Sainsburys
 const getPriceFromSainsburys = async (item) => {
     const url = `https://www.sainsburys.co.uk/gol-ui/SearchResults/${encodeURIComponent(item)}`;
+    console.log(`Starting Sainsburys scrape for item: ${item}`);
 
-    const browser = await launchBrowser();
+    const browser = await launchBrowser(); // Launch a new browser instance
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -98,6 +102,7 @@ const getPriceFromSainsburys = async (item) => {
 
     try {
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        console.log('Sainsburys page loaded');
         await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 10000 });
         await delay(100);
 
@@ -117,7 +122,7 @@ const getPriceFromSainsburys = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error (Sainsburys):', error.message, error.stack);
+        console.error('Sainsburys scraping error:', error.message);
         return null;
     } finally {
         await browser.close();
@@ -127,8 +132,9 @@ const getPriceFromSainsburys = async (item) => {
 // Function to scrape price from Tesco
 const getPriceFromTesco = async (item) => {
     const url = `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(item)}&inputType=free+text/`;
+    console.log(`Starting Tesco scrape for item: ${item}`);
 
-    const browser = await launchBrowser();
+    const browser = await launchBrowser(); // Launch a new browser instance
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -142,6 +148,7 @@ const getPriceFromTesco = async (item) => {
 
     try {
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        console.log('Tesco page loaded');
         await page.waitForSelector('.ddsweb-buybox__price', { timeout: 10000 });
         await delay(100);
 
@@ -161,7 +168,7 @@ const getPriceFromTesco = async (item) => {
 
         return productData.price || null;
     } catch (error) {
-        console.error('Scraping error (Tesco):', error.message, error.stack);
+        console.error('Tesco scraping error:', error.message);
         return null;
     } finally {
         await browser.close();
@@ -172,13 +179,16 @@ const cache = new Map();
 
 app.post('/get-price', async (req, res) => {
     const { store, item } = req.body;
+    console.log(`Received request for store: ${store}, item: ${item}`);
 
     if (!store || !item) {
+        console.error('Missing store or item in request.');
         return res.status(400).json({ error: 'Store and item are required.' });
     }
 
     const cacheKey = `${store}-${item.toLowerCase()}`;
     if (cache.has(cacheKey)) {
+        console.log(`Cache hit for ${cacheKey}`);
         return res.json({ price: cache.get(cacheKey) });
     }
 
@@ -195,13 +205,16 @@ app.post('/get-price', async (req, res) => {
                 price = await getPriceFromTesco(item);
                 break;
             default:
+                console.error(`Unsupported store: ${store}`);
                 return res.status(400).json({ error: 'Store not supported.' });
         }
 
         if (price === null || isNaN(price)) {
+            console.error('Invalid price received from scraper.');
             return res.status(500).json({ error: 'Invalid price received from scraper.' });
         }
 
+        console.log(`Scraped price for ${item} at ${store}: £${price}`);
         cache.set(cacheKey, price);
         res.json({ price });
     } catch (error) {
@@ -210,11 +223,13 @@ app.post('/get-price', async (req, res) => {
     }
 });
 
-// Serve index.html
+// Serve index.html for any route that doesn't match an API endpoint
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'Shopping.html'));
+    res.sendFile(path.resolve(__dirname, 'Shopping.html'));  // Adjust if needed
 });
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+console.log('Current working directory:', __dirname);
