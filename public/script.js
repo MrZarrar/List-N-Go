@@ -97,7 +97,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
 
     try {
         const response = await fetch(apiUrl, { // Use the dynamic API URL
-            method: 'GET',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             // Pass store and item as query parameters
             body: JSON.stringify({ store, item }),
