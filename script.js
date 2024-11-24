@@ -93,7 +93,8 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('item').focus(); // Refocus on the item input
 
     try {
-        const response = await fetch('http://localhost:10000/get-price', {
+        const apiUrl = window.location.origin;  // Uses the current domain
+        const response = await fetch(`${apiUrl}/get-price`,  {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),
@@ -113,7 +114,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
             showNotification(data.error || 'An error occurred.');
         }
     } catch (error) {
-        showNotification('Error fetching price. Please try again later.');
+        showNotification('Error fetching price. Please try again later - host issue.');
         console.error(error);
     }
 });
@@ -144,7 +145,6 @@ function showNotification(message) {
 
 // Load saved data when the page loads
 document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
-
 
 // Function to reorder items based on checked state
 function reorderItems() {
