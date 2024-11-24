@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 let browserPool = []; // Browser pool
 
@@ -58,10 +58,10 @@ const getPriceFromAsda = async (item) => {
 
     try {
         // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
 
         // Wait for the product listing to load
-        await page.waitForSelector('.co-item', { timeout: 10000 });
+        await page.waitForSelector('.co-item', { timeout: 100000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
         await delay(100);
@@ -109,10 +109,10 @@ const getPriceFromSainsburys = async (item) => {
 
     try {
         // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
 
         // Wait for the price container to load
-        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 10000 });
+        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 100000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
         await delay(100);
@@ -162,10 +162,10 @@ const getPriceFromTesco = async (item) => {
 
     try {
         // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
 
         // Wait for the product price container to load
-        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 10000 });
+        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 100000 });
 
         // Use delay to simulate a waiting period for the page to finish loading
         await delay(100);
