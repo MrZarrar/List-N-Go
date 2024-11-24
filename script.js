@@ -93,22 +93,15 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('item').focus(); // Refocus on the item input
 
     try {
-        const API_URL = 'https://listngo.onrender.com/get-price'; // Hardcoded Render URL
-
-        console.log(`Making request to: ${API_URL}`); // Debugging log for endpoint
-
-        const response = await fetch(API_URL, {
+        const response = await fetch('http://localhost:3000/get-price', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),
         });
 
-        console.log('Response status:', response.status); // Debugging log for response status
+        const data = await response.json();
 
         if (response.ok) {
-            const data = await response.json();
-            console.log('Received data:', data); // Debugging log for response data
-
             const price = parseFloat(data.price);
             if (isNaN(price)) {
                 showNotification('Invalid price received from server.');
@@ -117,12 +110,11 @@ document.getElementById('addItem').addEventListener('click', async function () {
 
             addItemToList(item, quantity, price);
         } else {
-            const data = await response.json();
             showNotification(data.error || 'An error occurred.');
         }
     } catch (error) {
-        showNotification('Error fetching price. Please try again later - host issue.');
-        console.error('Error during fetch:', error);
+        showNotification('Error fetching price. Please try again later.');
+        console.error(error);
     }
 });
 
@@ -152,6 +144,7 @@ function showNotification(message) {
 
 // Load saved data when the page loads
 document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
+
 
 // Function to reorder items based on checked state
 function reorderItems() {
