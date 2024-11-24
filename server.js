@@ -217,3 +217,5 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+console.log('Current working directory:', __dirname);
