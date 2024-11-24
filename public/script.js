@@ -1,6 +1,3 @@
-// Determine the API URL based on the environment
-const apiUrl = window.location.origin + '/get-price'; // Dynamically build the API URL for Vercel
-
 // Save the shopping list and total price to Local Storage
 function saveToLocalStorage() {
     const shoppingList = document.getElementById('shoppingList').innerHTML;
@@ -25,11 +22,11 @@ function loadFromLocalStorage() {
                 const listItem = checkbox.closest('li');
                 listItem.style.textDecoration = checkbox.checked ? 'line-through' : 'none';
                 saveToLocalStorage();
-                reorderItems(); // Ensure the list is reordered when a checkbox is clicked
+                reorderItems();  // Ensure the list is reordered when a checkbox is clicked
             });
         });
 
-        reorderItems(); // Ensure the list is ordered after loading from localStorage
+        reorderItems();  // Ensure the list is ordered after loading from localStorage
     }
 
     if (savedTotal) {
@@ -56,7 +53,7 @@ function addItemToList(item, quantity, price) {
     checkbox.addEventListener('change', function () {
         listItem.style.textDecoration = checkbox.checked ? 'line-through' : 'none';
         saveToLocalStorage();
-        reorderItems(); // Ensure the list is reordered when a checkbox is clicked
+        reorderItems();  // Ensure the list is reordered when a checkbox is clicked
     });
 
     shoppingList.appendChild(listItem);
@@ -69,7 +66,7 @@ function addItemToList(item, quantity, price) {
     // Save to Local Storage
     saveToLocalStorage();
 
-    reorderItems(); // Reorder items when a new one is added
+    reorderItems();  // Reorder items when a new one is added
 }
 
 // Reset the shopping list
@@ -95,11 +92,12 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('quantity').value = '1';
     document.getElementById('item').focus(); // Refocus on the item input
 
+    const backendUrl = process.env.BACKEND_API_URL || 'http://localhost:3000';  // Default to localhost if no environment variable
+
     try {
-        const response = await fetch(apiUrl, { // Use the dynamic API URL
+        const response = await fetch(`${backendUrl}/get-price`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Pass store and item as query parameters
             body: JSON.stringify({ store, item }),
         });
 
@@ -148,6 +146,7 @@ function showNotification(message) {
 
 // Load saved data when the page loads
 document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
+
 
 // Function to reorder items based on checked state
 function reorderItems() {
