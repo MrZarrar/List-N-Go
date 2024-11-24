@@ -42,6 +42,10 @@ input, select, button {
     color: #fff;
 }
 
+span {
+    color: #00eeff;
+}
+
 /* Center the text inside the select dropdown */
 select {
     color: #00eeff;
