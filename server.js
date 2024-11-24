@@ -1,5 +1,6 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
+require("dotenv").config()
 const compression = require('compression');
 const cors = require('cors');
 
@@ -16,13 +17,16 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 // Function to launch a new browser instance
 const launchBrowser = async () => {
     return await puppeteer.launch({
+        executablePath:
+            process.env.Node_ENV === "production"
+                ? process.env.PUPPETEER_EXECUTABLE_PATH
+                : puppeteer.executablePath(),
         headless: true, // Set to false for debugging
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--window-size=1920,1080'
+            '--single-process',
+            '--no-zygote',
         ]
     });
 };
