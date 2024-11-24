@@ -1,3 +1,8 @@
+// Determine the API URL based on the environment (local or production)
+const apiUrl = process.env.NODE_ENV === 'production'
+    ? 'https://your-backend-url.vercel.app'  // Replace with your production URL
+    : 'http://localhost:3000';  // Local URL for development
+
 // Save the shopping list and total price to Local Storage
 function saveToLocalStorage() {
     const shoppingList = document.getElementById('shoppingList').innerHTML;
@@ -26,7 +31,7 @@ function loadFromLocalStorage() {
             });
         });
 
-        reorderItems();  // Ensure the list is ordered after loading from localStorage
+        reorderItems();  // Ensure the list is ordered after loading from Local Storage
     }
 
     if (savedTotal) {
@@ -93,7 +98,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('item').focus(); // Refocus on the item input
 
     try {
-        const response = await fetch('http://localhost:3000/get-price', {
+        const response = await fetch(`${apiUrl}/get-price`, { // Use dynamic API URL
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),

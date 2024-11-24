@@ -57,6 +57,11 @@ select {
     width: 100%;
 }
 
+
+span {
+    color: #00eeff;
+}
+
 #item {
     flex: 3;
     text-align: center;
