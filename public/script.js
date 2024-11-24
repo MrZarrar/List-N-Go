@@ -1,5 +1,5 @@
 // Determine the API URL based on the environment
-const apiUrl = window.location.origin + '/api/get-price'; // Dynamically build the API URL for Vercel
+const apiUrl = window.location.origin + '/get-price'; // Dynamically build the API URL for Vercel
 
 // Save the shopping list and total price to Local Storage
 function saveToLocalStorage() {
