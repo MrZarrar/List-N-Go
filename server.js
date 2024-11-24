@@ -13,7 +13,7 @@ let browser; // Single browser instance
     try {
         // Launch a single browser instance
         browser = await puppeteer.launch({
-            headless: true,
+            headless: 'new',  // Use 'new' headless mode for Puppeteer
             args: [
                 '--no-sandbox',        // Run without sandbox (required for Cloud Run)
                 '--disable-setuid-sandbox', // Disable the setuid sandbox (required for Cloud Run)
@@ -239,14 +239,14 @@ app.post('/get-price', async (req, res) => {
 });
 
 // Gracefully close browser instance when the server shuts down
-process.on('SIGINT', async () => {
+process.on('SIGTERM', async () => {
     if (browser) {
         await browser.close();
-        console.log('Browser instance closed');
+        console.log('Browser instance closed gracefully.');
     }
-    process.exit();
+    process.exit(0);
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server listening at http://localhost:${port}`);
 });

@@ -1,39 +1,41 @@
-# Use a Node.js base image with Puppeteer dependencies
-FROM node:18
+# Use a Node.js base image
+FROM node:20-slim
 
-# Install dependencies needed for Puppeteer
+# Install necessary dependencies for Puppeteer
 RUN apt-get update && apt-get install -y \
+    dumb-init \
     ca-certificates \
     fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
+    libatk1.0-0 \
     libatk-bridge2.0-0 \
     libcups2 \
-    libnss3 \
-    libxss1 \
-    lsb-release \
+    libdbus-1-3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxrandr2 \
+    libxdamage1 \
+    libxfixes3 \
+    libxkbcommon0 \
     xdg-utils \
-    chromium \
-    --no-install-recommends && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    libpangocairo-1.0-0 \
+    libnss3 \
+    libglib2.0-0 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package.json and package-lock.json
 COPY package*.json ./
+
+# Install dependencies (including Puppeteer)
 RUN npm install
 
-# Copy the entire application code
+# Copy the rest of your application code
 COPY . .
 
-# Expose the port (replace with your app's port)
+# Expose the app on port 8080
 EXPOSE 8080
 
-# Set the environment variable to specify the path to Chromium (in case needed)
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-
 # Start the app
-CMD ["node", "server.js"]
-
+CMD ["dumb-init", "node", "server.js"]
