@@ -23,7 +23,7 @@ let browserPool = []; // Browser pool
 
 const cache = new Map();
 
-app.use(cors());
+app.use(cors()); // Enable CORS for all origins (you can customize this later)
 app.use(compression());
 app.use(express.json());
 
