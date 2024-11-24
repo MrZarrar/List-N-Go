@@ -1,6 +1,6 @@
 // Determine the API URL based on the environment (local or production)
 const apiUrl = process.env.NODE_ENV === 'production'
-    ? 'https://your-backend-url.vercel.app'  // Replace with your production URL
+    ? 'https://listngo-mrzarrars-projects.vercel.app/'  // Replace with your production URL
     : 'http://localhost:3000';  // Local URL for development
 
 // Save the shopping list and total price to Local Storage
