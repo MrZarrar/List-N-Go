@@ -13,7 +13,7 @@ app.use(compression());
 app.use(express.json());
 
 // Serve static files from the 'build' directory (or your public directory)
-app.use(express.static(path.join(__dirname, 'build')));  // Adjust if your frontend is in a different folder
+app.use(express.static(path.join(__dirname,)));  // Adjust if your frontend is in a different folder
 
 // Utility to add a delay (replaces waitForTimeout)
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
