@@ -1,12 +1,12 @@
 const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const NodeCache = require('node-cache');
+const cors = require('cors'); // Importing the CORS package
 const app = express();
 const port = 3000;
 
-// Create a cache instance with a default TTL of 3600 seconds (1 hour)
-const cache = new NodeCache({ stdTTL: 3600 });
+// Use CORS middleware
+app.use(cors()); // This will enable CORS for all routes
 
 // Helper function to scrape Asda for the price of an item
 async function getPriceFromAsda(item) {
@@ -76,13 +76,6 @@ app.get('/get-price', async (req, res) => {
         return res.status(400).json({ error: 'Store and item are required.' });
     }
 
-    const cacheKey = `${store}-${item.toLowerCase()}`;
-
-    // Check if the price is cached
-    if (cache.has(cacheKey)) {
-        return res.json({ price: cache.get(cacheKey) });
-    }
-
     let price = null;
 
     // Choose the appropriate function based on the store
@@ -103,9 +96,6 @@ app.get('/get-price', async (req, res) => {
     if (price === null) {
         return res.status(404).json({ error: 'Price not found.' });
     }
-
-    // Cache the price for subsequent requests
-    cache.set(cacheKey, price);
 
     return res.json({ price });
 });
