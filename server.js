@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+console.log('Files in the project directory:', fs.readdirSync(__dirname));
 const puppeteer = require('puppeteer');
 require("dotenv").config();
 const compression = require('compression');
