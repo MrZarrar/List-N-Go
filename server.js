@@ -13,7 +13,7 @@ app.use(compression());
 app.use(express.json());
 
 // Serve static files from the 'build' directory (or your public directory)
-app.use(express.static(path.join(__dirname,)));  // Adjust if your frontend is in a different folder
+app.use(express.static(path.resolve(__dirname)));  // Adjust if your frontend is in a different folder
 
 // Utility to add a delay (replaces waitForTimeout)
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -211,7 +211,7 @@ app.post('/get-price', async (req, res) => {
 
 // Serve index.html for any route that doesn't match an API endpoint
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'shopping.html'));  // Adjust if needed
+    res.sendFile(path.resolve(__dirname, 'shopping.html'));  // Adjust if needed
 });
 
 app.listen(port, () => {
