@@ -8,7 +8,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(compression());
@@ -21,21 +21,18 @@ app.use(express.static(path.resolve(__dirname)));  // Adjust if your frontend is
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to launch a new browser instance
-
 const launchBrowser = async () => {
-    const executablePath = process.env.NODE_ENV === 'production'
-        ? process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable'  // Default path
-        : puppeteer.executablePath();
-
     return await puppeteer.launch({
-        executablePath,
-        headless: true,
+        executablePath:
+            process.env.NODE_ENV === "production"
+                ? process.env.PUPPETEER_EXECUTABLE_PATH
+                : puppeteer.executablePath(),
+        headless: true, // Set to false for debugging
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--single-process',
             '--no-zygote',
-            '--disable-dev-shm-usage',
         ]
     });
 };
@@ -59,9 +56,9 @@ const getPriceFromAsda = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Timeout set to 1 minute
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
         console.log('Asda page loaded');
-        await page.waitForSelector('.co-item', { timeout: 60000 }); // Timeout set to 1 minute
+        await page.waitForSelector('.co-item', { timeout: 100000 });
         await delay(100); // Wait for content to load
 
         const productData = await page.evaluate(() => {
@@ -104,9 +101,9 @@ const getPriceFromSainsburys = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Timeout set to 1 minute
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
         console.log('Sainsburys page loaded');
-        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 60000 }); // Timeout set to 1 minute
+        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 100000 });
         await delay(100);
 
         const productData = await page.evaluate(() => {
@@ -150,9 +147,9 @@ const getPriceFromTesco = async (item) => {
     });
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Timeout set to 1 minute
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
         console.log('Tesco page loaded');
-        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 60000 }); // Timeout set to 1 minute
+        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 100000 });
         await delay(100);
 
         const productData = await page.evaluate(() => {
@@ -236,5 +233,3 @@ app.listen(port, () => {
 });
 
 console.log('Current working directory:', __dirname);
-
-console.log(`Using Chrome path: ${process.env.PUPPETEER_EXECUTABLE_PATH || 'Default path'}`);

@@ -93,7 +93,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
     document.getElementById('item').focus(); // Refocus on the item input
 
     try {
-        const response = await fetch('http://localhost:10000/get-price', {
+        const response = await fetch('http://localhost:3000/get-price', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),
@@ -113,7 +113,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
             showNotification(data.error || 'An error occurred.');
         }
     } catch (error) {
-        showNotification('Error fetching price. Please try again later. host issue');
+        showNotification('Error fetching price. Please try again later.');
         console.error(error);
     }
 });
