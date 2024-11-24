@@ -1,15 +1,19 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
-require("dotenv").config()
+require("dotenv").config();
 const compression = require('compression');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(compression());
 app.use(express.json());
+
+// Serve static files from the 'build' directory (or your public directory)
+app.use(express.static(path.join(__dirname, 'build')));  // Adjust if your frontend is in a different folder
 
 // Utility to add a delay (replaces waitForTimeout)
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -18,7 +22,7 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const launchBrowser = async () => {
     return await puppeteer.launch({
         executablePath:
-            process.env.Node_ENV === "production"
+            process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer.executablePath(),
         headless: true, // Set to false for debugging
@@ -203,6 +207,11 @@ app.post('/get-price', async (req, res) => {
         console.error('Error processing request:', error.message);
         res.status(500).json({ error: 'Internal server error.' });
     }
+});
+
+// Serve index.html for any route that doesn't match an API endpoint
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'shopping.html'));  // Adjust if needed
 });
 
 app.listen(port, () => {
