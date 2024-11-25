@@ -86,6 +86,7 @@
     document.getElementById('resetList').addEventListener('click', function () {
     document.getElementById('shoppingList').innerHTML = '';
     document.getElementById('totalPrice').textContent = '£0.00';
+        document.getElementById('totalPriceTopRight').textContent = '£0.00';
     localStorage.clear(); // Clear Local Storage
 });
 
