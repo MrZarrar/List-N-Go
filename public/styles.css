@@ -239,18 +239,17 @@ button:hover {
 
 /* Footer styling */
 .footer {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
     background: var(--second-bg-color);
-    padding: 0.8rem 1.5rem; /* Reduced padding */
+    padding: 0.8rem 1.5rem;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8rem; /* Reduced font size */
+    font-size: 1rem;
+    margin-top: 2rem; /* Ensure it's spaced properly from the shopping list */
 }
+
 
 
 .footer-text p {
