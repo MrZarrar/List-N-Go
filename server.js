@@ -30,12 +30,15 @@ const getPriceFromAsda = async (item) => {
         const product = $('.co-item').first();
         if (!product.length) return null;
 
-        // Extract price
+        // Extract price using refined selector
         const priceElement = product.find('.co-product__price').first();
+        if (!priceElement.length) return null;
+
+        // Extract and clean the price text
         const priceText = priceElement.text().trim();
         if (!priceText) return null;
 
-        // Convert price to numeric value
+        // Remove any non-numeric characters except the decimal point
         const numericPrice = priceText.replace(/[^\d.]/g, '');
         return parseFloat(numericPrice) || null;
     } catch (error) {
