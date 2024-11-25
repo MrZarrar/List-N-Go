@@ -14,13 +14,13 @@ input:focus, select:focus {
 body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align to top so the footer stays below */
     height: 100vh;
     margin: 0;
     background-color: var(--bg-color);
     font-family: 'Poppins', sans-serif;
     color: var(--text-color);
-    overflow: auto;
+    overflow: hidden; /* Prevent body from scrolling */
 }
 
 /* Container for the shopping app */
@@ -36,8 +36,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-height: calc(100vh - 150px); /* Subtract footer height from viewport */
+    overflow-y: auto; /* Allow the container to scroll */
 }
 
 /* Style the input fields, select, and buttons */

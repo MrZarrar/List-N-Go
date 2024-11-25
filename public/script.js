@@ -110,7 +110,7 @@
 
     const backendUrlLocal = 'http://localhost:3000/get-price';
     try {
-    const response = await fetch(backendUrl, {
+    const response = await fetch(backendUrlLocal, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ store, item }),
