@@ -106,11 +106,11 @@
     document.getElementById('item').focus(); // Refocus on the item input
 
     // Manually set the backend URL to your production URL
-    const backendUrl = 'https://list-n-go-232454279663.us-central1.run.app/get-price';
+    const backendUrl = 'https://list-n-go.com/get-price';
 
     const backendUrlLocal = 'http://localhost:3000/get-price';
     try {
-    const response = await fetch(backendUrlLocal, {
+    const response = await fetch(backendUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ store, item }),
