@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(compression());
@@ -20,15 +20,24 @@ app.get('/', (req, res) => {
 
 // Playwright scraper function
 const scrapeWithPlaywright = async (url, selectors) => {
-    const browser = await chromium.launch({
-        headless: true,
-        channel: 'chromium', // Ensures compatibility with the updated Playwright
-        timeout: 60000
-    });
-    const page = await browser.newPage();
-
+    let browser;
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000  });
+        console.log("Launching browser...");
+        browser = await chromium.launch({
+            headless: false,
+            channel: 'chromium',
+            timeout: 60000 // Adjusted timeout for launching the browser
+        });
+
+        const page = await browser.newPage();
+        console.log("Browser launched, navigating to:", url);
+
+        // Go to the page and wait for the price element to be available
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 }); // Adjusted timeout for navigation
+        console.log("Page loaded, waiting for price element...");
+
+        // Wait for the price element to appear
+        await page.waitForSelector(selectors.price, { timeout: 10000 }); // Wait for the price element, adjust timeout if needed
 
         const result = await page.evaluate((selectors) => {
             const element = document.querySelector(selectors.price);
@@ -39,12 +48,16 @@ const scrapeWithPlaywright = async (url, selectors) => {
             return parseFloat(numericPrice) || null;
         }, selectors);
 
+        console.log("Scraping result:", result);
         return result;
+
     } catch (error) {
         console.error('Error scraping with Playwright:', error.message);
         return null;
     } finally {
-        await browser.close();
+        if (browser) {
+            await browser.close();
+        }
     }
 };
 
