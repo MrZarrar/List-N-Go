@@ -1,41 +1,57 @@
-# Use a Node.js base image
-FROM node:20-slim
+# Use an official Node.js image as the base image
+FROM node:18-slim
 
-# Install necessary dependencies for Puppeteer
+# Install dependencies including Chromium, fonts, and other necessary libraries
 RUN apt-get update && apt-get install -y \
-    dumb-init \
-    ca-certificates \
+    chromium \
     fonts-liberation \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libx11-xcb1 \
+    libappindicator3-1 \
+    libasound2 \
+    libnspr4 \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
+    wget \
+    ca-certificates \
+    curl \
+    unzip \
+    git \
+    vim \
+    libx11-dev \
     libxcomposite1 \
     libxrandr2 \
-    libxdamage1 \
-    libxfixes3 \
-    libxkbcommon0 \
-    xdg-utils \
-    libpangocairo-1.0-0 \
-    libnss3 \
-    libglib2.0-0 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libgtk-3-0 \
+    libgbm1 \
+    libnotify4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    libdbus-1-3 \
+    libgdk-pixbuf2.0-0 \
+    libpango-1.0-0 \
+    libepoxy0 \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set environment variables for Puppeteer
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV CHROME_BIN=/usr/bin/chromium
+
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json (or yarn.lock)
 COPY package*.json ./
 
-# Install dependencies (including Puppeteer)
+# Install app dependencies (including Puppeteer and others)
 RUN npm install
 
-# Copy the rest of your application code
+# Copy the rest of the app's code into the container
 COPY . .
 
-# Expose the app on port 8080
+# Expose the port that the app will run on
 EXPOSE 8080
 
-# Start the app
-CMD ["dumb-init", "node", "server.js"]
+# Set the entrypoint to start the server
+CMD ["npm", "start"]
