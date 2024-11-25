@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/playwright:focals
+FROM mcr.microsoft.com/playwright:v1.38.0-focal
 
 WORKDIR /app
 
-# Install required dependenciess
+# Install required dependencies
 RUN apt-get update && apt-get install -y \
     libxfixes3 \
     libxkbcommon0 \
