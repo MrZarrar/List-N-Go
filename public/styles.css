@@ -14,7 +14,7 @@ input:focus, select:focus {
 body {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align to top so the footer stays below */
+    align-items: center; /* Align to top so the footer stays below */
     height: 100vh;
     margin: 0;
     background-color: var(--bg-color);
@@ -152,7 +152,7 @@ button:hover {
 
 #totalPriceTopRight {
     position: absolute;
-    top: 1rem;
+    top: 2rem;
     right: 1rem;
     font-size: 1.8rem;
     font-weight: bold;
