@@ -17,4 +17,5 @@ COPY . .
 
 CMD ["node", "server.js"]
 
+#retry
 #nothing
