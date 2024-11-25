@@ -23,11 +23,12 @@ const scrapeWithPlaywright = async (url, selectors) => {
     const browser = await chromium.launch({
         headless: true,
         channel: 'chromium', // Ensures compatibility with the updated Playwright
+        timeout: 60000
     });
     const page = await browser.newPage();
 
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000  });
 
         const result = await page.evaluate((selectors) => {
             const element = document.querySelector(selectors.price);
@@ -101,7 +102,7 @@ app.post('/get-price', async (req, res) => {
         }
 
         if (price === null || isNaN(price)) {
-            return res.status(505).json({ error: 'Invalid price received from scraper.' });
+            return res.status(505).json({ error: 'Invalid price received from scraper. ' + price });
         }
 
         cache.set(cacheKey, price);

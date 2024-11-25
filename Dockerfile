@@ -9,8 +9,19 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     libxfixes3 \
     libxkbcommon0 \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxtst6 \
+    libnss3-dev \
+    libgbm-dev \
+    --no-install-recommends \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+
 
 # Install Node.js v22
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
