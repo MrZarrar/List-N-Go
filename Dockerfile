@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/playwright:focals
 
 WORKDIR /app
 
-# Install required dependencies
+# Install required dependenciess
 RUN apt-get update && apt-get install -y \
     libxfixes3 \
     libxkbcommon0 \
