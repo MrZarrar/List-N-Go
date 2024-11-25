@@ -30,7 +30,6 @@ const scrapeWithPlaywright = async (url, selectors) => {
         });
 
         const page = await browser.newPage();
-        await page.route('**/*.{png,jpg,jpeg,webp,css,woff,woff2}', (route) => route.abort());
         console.log("Browser launched, navigating to:", url);
 
         // Go to the page and wait for the price element to be available
