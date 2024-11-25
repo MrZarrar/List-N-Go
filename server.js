@@ -20,7 +20,10 @@ app.get('/', (req, res) => {
 
 // Playwright scraper function
 const scrapeWithPlaywright = async (url, selectors) => {
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({
+        headless: true,
+        channel: 'chromium', // Ensures compatibility with the updated Playwright
+    });
     const page = await browser.newPage();
 
     try {
