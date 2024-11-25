@@ -1,34 +1,12 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const compression = require('compression');
 const cors = require('cors');
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 8080;
-
-let browser; // Single browser instance
-
-(async () => {
-    try {
-        // Launch a single browser instance
-        browser = await puppeteer.launch({
-            headless: 'new',  // Use 'new' headless mode for Puppeteer
-            args: [
-                '--no-sandbox',        // Run without sandbox (required for Cloud Run)
-                '--disable-setuid-sandbox', // Disable the setuid sandbox (required for Cloud Run)
-                '--disable-dev-shm-usage', // Disable shared memory usage (required for Cloud Run)
-                '--remote-debugging-port=9222', // Allow debugging (optional)
-            ],
-            executablePath: process.env.CHROME_BIN || '/usr/bin/chromium-browser', // Ensure the correct executable path
-        });
-        console.log('Browser instance initialized');
-    } catch (error) {
-        console.error('Error launching browser:', error.message);
-    }
-})();
-
-const cache = new Map();
 
 app.use(cors()); // Enable CORS for all origins (you can customize this later)
 app.use(compression());
@@ -41,156 +19,68 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Shopping.html'));
 });
 
-// Utility to add a delay (replaces waitForTimeout)
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 // Function to scrape price from Asda
 const getPriceFromAsda = async (item) => {
     const url = `https://groceries.asda.com/search/${encodeURIComponent(item)}`;
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-
-    // Intercept requests and block unnecessary resources (e.g., images)
-    page.on('request', (req) => {
-        if (['image', 'font', 'media'].includes(req.resourceType())) {
-            req.abort(); // Abort non-essential requests like images
-        } else {
-            req.continue(); // Continue with other requests
-        }
-    });
-
     try {
-        // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
 
-        // Wait for the product listing to load
-        await page.waitForSelector('.co-item', { timeout: 100000 });
+        // Select the product price
+        const priceElement = $('.co-item .co-product__price').first();
+        if (priceElement.length === 0) return null;
 
-        // Use delay to simulate a waiting period for the page to finish loading
-        await delay(100);
-
-        // Limit scraping to necessary data (price)
-        const productData = await page.evaluate(() => {
-            const product = document.querySelector('.co-item');
-            if (!product) return { price: null };
-
-            const priceElement = product.querySelector('.co-product__price');
-            const priceText = priceElement ? priceElement.textContent.trim() : null;
-            if (priceText) {
-                const numericPrice = priceText.replace(/[^\d.]/g, '');
-                return { price: parseFloat(numericPrice) };
-            }
-            return { price: null };
-        });
-
-        return productData.price || null;
+        const priceText = priceElement.text().trim();
+        const numericPrice = priceText.replace(/[^\d.]/g, '');
+        return parseFloat(numericPrice) || null;
     } catch (error) {
         console.error('Scraping error from Asda:', error.message);
         return null;
-    } finally {
-        await page.close();
     }
 };
 
 // Function to scrape price from Sainsburys
 const getPriceFromSainsburys = async (item) => {
     const url = `https://www.sainsburys.co.uk/gol-ui/SearchResults/${encodeURIComponent(item)}`;
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-
-    // Intercept requests and block unnecessary resources (e.g., images)
-    page.on('request', (req) => {
-        if (['image', 'font', 'media'].includes(req.resourceType())) {
-            req.abort(); // Abort non-essential requests like images
-        } else {
-            req.continue(); // Continue with other requests
-        }
-    });
-
     try {
-        // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
 
-        // Wait for the price container to load
-        await page.waitForSelector('.pt__cost__retail-price__wrapper', { timeout: 100000 });
+        // Select the price container
+        const priceElement = $('.pt__cost__retail-price').first();
+        if (priceElement.length === 0) return null;
 
-        // Use delay to simulate a waiting period for the page to finish loading
-        await delay(100);
-
-        // Limit scraping to necessary data (price)
-        const productData = await page.evaluate(() => {
-            const priceContainer = document.querySelector('.pt__cost__retail-price__wrapper');
-            if (!priceContainer) return { price: null };
-
-            const priceElement = priceContainer.querySelector('.pt__cost__retail-price');
-            const priceText = priceElement ? priceElement.textContent.trim() : null;
-
-            if (priceText) {
-                const numericPrice = priceText.replace(/[^\d.]/g, ''); // Removes £ and non-numeric characters
-                return { price: parseFloat(numericPrice) }; // Converts to a float
-            }
-
-            return { price: null };
-        });
-
-        return productData.price || null;
+        const priceText = priceElement.text().trim();
+        const numericPrice = priceText.replace(/[^\d.]/g, '');
+        return parseFloat(numericPrice) || null;
     } catch (error) {
         console.error('Scraping error from Sainsburys:', error.message);
         return null;
-    } finally {
-        await page.close();
     }
 };
 
 // Function to scrape price from Tesco
 const getPriceFromTesco = async (item) => {
     const url = `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(item)}&inputType=free+text/`;
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-
-    // Intercept requests and block unnecessary resources (e.g., images)
-    page.on('request', (req) => {
-        if (['image', 'font', 'media'].includes(req.resourceType())) {
-            req.abort(); // Abort non-essential requests like images
-        } else {
-            req.continue(); // Continue with other requests
-        }
-    });
-
     try {
-        // Open the page and wait until it is fully loaded
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 100000 });
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
 
-        // Wait for the product price container to load
-        await page.waitForSelector('.ddsweb-buybox__price', { timeout: 100000 });
+        // Select the price container
+        const priceElement = $('.ddsweb-buybox__price .styled__PriceText-sc-v0qv7n-1').first();
+        if (priceElement.length === 0) return null;
 
-        // Use delay to simulate a waiting period for the page to finish loading
-        await delay(1000);
-
-        // Limit scraping to necessary data (price)
-        const productData = await page.evaluate(() => {
-            const priceContainer = document.querySelector('.ddsweb-buybox__price');
-            if (!priceContainer) return { price: null };
-
-            const priceElement = priceContainer.querySelector('.styled__PriceText-sc-v0qv7n-1');
-            const priceText = priceElement ? priceElement.textContent.trim() : null;
-
-            if (priceText) {
-                const numericPrice = priceText.replace(/[^\d.]/g, ''); // Removes £ and non-numeric characters
-                return { price: parseFloat(numericPrice) }; // Converts to a float
-            }
-
-            return { price: null };
-        });
-
-        return productData.price || null;
+        const priceText = priceElement.text().trim();
+        const numericPrice = priceText.replace(/[^\d.]/g, '');
+        return parseFloat(numericPrice) || null;
     } catch (error) {
         console.error('Scraping error from Tesco:', error.message);
         return null;
-    } finally {
-        await page.close();
     }
 };
+
+// Cache to store prices
+const cache = new Map();
 
 // Post route to get the price
 app.post('/get-price', async (req, res) => {
@@ -236,15 +126,6 @@ app.post('/get-price', async (req, res) => {
         console.error('Error processing request:', error.message);
         res.status(500).json({ error: 'Internal server error.' });
     }
-});
-
-// Gracefully close browser instance when the server shuts down
-process.on('SIGTERM', async () => {
-    if (browser) {
-        await browser.close();
-        console.log('Browser instance closed gracefully.');
-    }
-    process.exit(0);
 });
 
 app.listen(port, () => {
