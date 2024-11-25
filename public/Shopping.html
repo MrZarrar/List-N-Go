@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping List</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container">
+    <span id="totalPriceTopRight" class="total-price">£0.00</span>
     <h1>List <span>'N'</span> Go</h1>
     <select id="store">
         <option value="asda">Asda</option>
@@ -24,9 +29,23 @@
         <button id="addItem">Add Item</button>
         <button id="resetList">Reset List</button>
     </div>
-    <ul id="shoppingList" class="shopping-list"></ul>
+
+    <!-- Shopping list directly inside the container -->
+    <ul id="shoppingList"></ul>
+
     <div id="totalPrice">£0.00</div>
 </div>
+
+<!-- Footer positioned at bottom-right of container -->
+<footer class="footer">
+    <div class="footer-text">
+        <p>Copyright &copy; 2024 by Mushaf Zarrar | All Rights Reserved.</p>
+    </div>
+    <div class="footer-iconTop">
+        <a href="#home"><i class="bx bx-up-arrow-alt"></i></a>
+    </div>
+</footer>
+
 <script src="script.js"></script>
 </body>
 </html>
