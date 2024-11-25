@@ -97,7 +97,7 @@ document.getElementById('addItem').addEventListener('click', async function () {
     const backendUrl = 'https://list-n-go-232454279663.us-central1.run.app';
 
     try {
-        const response = await fetch(`${backendUrl}/get-price`, {
+        const response = await fetch(`https://list-n-go-232454279663.us-central1.run.app/get-price`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store, item }),
