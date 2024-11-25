@@ -119,7 +119,7 @@ app.post('/get-price', async (req, res) => {
         }
 
         if (price === null || isNaN(price)) {
-            return res.status(500).json({ error: 'Invalid price received from scraper.' });
+            return res.status(505).json({ error: 'Invalid price received from scraper.' });
         }
 
         cache.set(cacheKey, price);
