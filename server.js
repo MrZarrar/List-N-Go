@@ -18,35 +18,26 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Shopping.html'));
 });
 
-// Optimized Playwright scraper function
+// Playwright scraper function
 const scrapeWithPlaywright = async (url, selectors) => {
     let browser;
-    let page;
     try {
         console.log("Launching browser...");
         browser = await chromium.launch({
             headless: true,
             channel: 'chromium',
-            args: ['--no-sandbox', '--disable-setuid-sandbox'], // Disable sandboxing for speed (use only for trusted environments)
-            timeout: 60000 // Launch timeout
+            timeout: 5000 // Adjusted timeout for launching the browser
         });
 
-        const context = await browser.newContext({
-            ignoreHTTPSErrors: true,
-            acceptDownloads: true
-        });
-
-        page = await context.newPage();
-
-        // Block unnecessary resources to speed up the load
-        await page.route('**/*.{png,jpg,jpeg,webp,css,woff,woff2}', (route) => route.abort());
-
+        const page = await browser.newPage();
         console.log("Browser launched, navigating to:", url);
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 }); // Reduced timeout for quicker loading
+
+        // Go to the page and wait for the price element to be available
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 5000 }); // Adjusted timeout for navigation
         console.log("Page loaded, waiting for price element...");
 
         // Wait for the price element to appear
-        await page.waitForSelector(selectors.price, { timeout: 10000 }); // Wait for price element
+        await page.waitForSelector(selectors.price, { timeout: 5000 }); // Wait for the price element, adjust timeout if needed
 
         const result = await page.evaluate((selectors) => {
             const element = document.querySelector(selectors.price);
