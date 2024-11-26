@@ -24,7 +24,7 @@ const scrapeWithPlaywright = async (url, selectors) => {
     try {
         console.log("Launching browser...");
         browser = await chromium.launch({
-            headless: false,
+            headless: true,
             channel: 'chromium',
             timeout: 10000 // Adjusted timeout for launching the browser
         });
