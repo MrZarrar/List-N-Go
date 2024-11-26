@@ -83,9 +83,13 @@ const getPriceFromTesco = async (item) => {
 };
 
 // Cache to store prices
-const cache = new Map();
+// Import Node.js' built-in memory store or use a simple Map
+const cache = new Map();  // Already defined in your code
 
-// Post route to get price
+// Example: Set expiration time (in milliseconds)
+const CACHE_EXPIRATION = 24 * 60 * 60 * 1000 * 7;  // 24 hours * 7
+
+// Updated route to check the cache first
 app.post('/get-price', async (req, res) => {
     const { store, item } = req.body;
 
@@ -94,10 +98,18 @@ app.post('/get-price', async (req, res) => {
     }
 
     const cacheKey = `${store}-${item.toLowerCase()}`;
+
+    // Check if item exists in the cache and is still valid
     if (cache.has(cacheKey)) {
-        return res.json({ price: cache.get(cacheKey) });
+        const cachedData = cache.get(cacheKey);
+        if (Date.now() - cachedData.timestamp < CACHE_EXPIRATION) {
+            return res.json({ price: cachedData.price });  // Return cached price
+        } else {
+            cache.delete(cacheKey);  // Remove expired data
+        }
     }
 
+    // If not in cache or expired, scrape the price
     try {
         let price;
         switch (store) {
@@ -115,10 +127,11 @@ app.post('/get-price', async (req, res) => {
         }
 
         if (price === null || isNaN(price)) {
-            return res.status(505).json({ error: 'Invalid price received from scraper. ' + price });
+            return res.status(505).json({ error: 'Invalid price received from scraper.' });
         }
 
-        cache.set(cacheKey, price);
+        // Save result to cache with a timestamp
+        cache.set(cacheKey, { price, timestamp: Date.now() });
         res.json({ price });
     } catch (error) {
         console.error('Error processing request:', error.message);
