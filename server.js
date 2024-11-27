@@ -18,26 +18,33 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Shopping.html'));
 });
 
+// Persistent browser instance
+let browserInstance;
+
+const getBrowserInstance = async () => {
+    if (!browserInstance) {
+        browserInstance = await chromium.launch({
+            headless: true,
+            timeout: 10000, // Adjusted timeout for launching the browser
+        });
+        console.log('Browser launched');
+    }
+    return browserInstance;
+};
+
 // Playwright scraper function
 const scrapeWithPlaywright = async (url, selectors) => {
-    let browser;
     try {
-        console.log("Launching browser...");
-        browser = await chromium.launch({
-            headless: true,
-            channel: 'chromium',
-            timeout: 10000 // Adjusted timeout for launching the browser
-        });
-
+        const browser = await getBrowserInstance();
         const page = await browser.newPage();
-        console.log("Browser launched, navigating to:", url);
+        console.log("Navigating to:", url);
 
         // Go to the page and wait for the price element to be available
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 50000 }); // Adjusted timeout for navigation
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 50000 });
         console.log("Page loaded, waiting for price element...");
 
         // Wait for the price element to appear
-        await page.waitForSelector(selectors.price, { timeout: 50000 }); // Wait for the price element, adjust timeout if needed
+        await page.waitForSelector(selectors.price, { timeout: 50000 });
 
         const result = await page.evaluate((selectors) => {
             const element = document.querySelector(selectors.price);
@@ -49,33 +56,28 @@ const scrapeWithPlaywright = async (url, selectors) => {
         }, selectors);
 
         console.log("Scraping result:", result);
+        await page.close();  // Close the page, not the browser
         return result;
 
     } catch (error) {
         console.error('Error scraping with Playwright:', error.message);
         return null;
-    } finally {
-        if (browser) {
-            await browser.close();
-        }
     }
 };
 
-// Function to scrape price from Asda
+// Functions to scrape prices
 const getPriceFromAsda = async (item) => {
     const url = `https://groceries.asda.com/search/${encodeURIComponent(item)}`;
     const selectors = { price: '.co-product__price' };
     return scrapeWithPlaywright(url, selectors);
 };
 
-// Function to scrape price from Sainsbury's
 const getPriceFromSainsburys = async (item) => {
     const url = `https://www.sainsburys.co.uk/gol-ui/SearchResults/${encodeURIComponent(item)}`;
     const selectors = { price: '.pt__cost__retail-price' };
     return scrapeWithPlaywright(url, selectors);
 };
 
-// Function to scrape price from Tesco
 const getPriceFromTesco = async (item) => {
     const url = `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(item)}`;
     const selectors = { price: '.ddsweb-buybox__price .styled__PriceText-sc-v0qv7n-1' };
@@ -83,13 +85,9 @@ const getPriceFromTesco = async (item) => {
 };
 
 // Cache to store prices
-// Import Node.js' built-in memory store or use a simple Map
-const cache = new Map();  // Already defined in your code
+const cache = new Map();
+const CACHE_EXPIRATION = 24 * 60 * 60 * 1000 * 7;  // 7 days
 
-// Example: Set expiration time (in milliseconds)
-const CACHE_EXPIRATION = 24 * 60 * 60 * 1000 * 7;  // 24 hours * 7
-
-// Updated route to check the cache first
 app.post('/get-price', async (req, res) => {
     const { store, item } = req.body;
 
@@ -103,13 +101,12 @@ app.post('/get-price', async (req, res) => {
     if (cache.has(cacheKey)) {
         const cachedData = cache.get(cacheKey);
         if (Date.now() - cachedData.timestamp < CACHE_EXPIRATION) {
-            return res.json({ price: cachedData.price });  // Return cached price
+            return res.json({ price: cachedData.price });
         } else {
-            cache.delete(cacheKey);  // Remove expired data
+            cache.delete(cacheKey);
         }
     }
 
-    // If not in cache or expired, scrape the price
     try {
         let price;
         switch (store) {
@@ -127,7 +124,7 @@ app.post('/get-price', async (req, res) => {
         }
 
         if (price === null || isNaN(price)) {
-            return res.status(505).json({ error: 'Invalid price received from scraper.' });
+            return res.status(500).json({ error: 'Invalid price received from scraper.' });
         }
 
         // Save result to cache with a timestamp
@@ -135,7 +132,7 @@ app.post('/get-price', async (req, res) => {
         res.json({ price });
     } catch (error) {
         console.error('Error processing request:', error.message);
-        res.status(510).json({ error: 'Internal server error.' });
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
