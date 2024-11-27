@@ -33,11 +33,11 @@ const scrapeWithPlaywright = async (url, selectors) => {
         console.log("Browser launched, navigating to:", url);
 
         // Go to the page and wait for the price element to be available
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }); // Adjusted timeout for navigation
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 50000 }); // Adjusted timeout for navigation
         console.log("Page loaded, waiting for price element...");
 
         // Wait for the price element to appear
-        await page.waitForSelector(selectors.price, { timeout: 20000 }); // Wait for the price element, adjust timeout if needed
+        await page.waitForSelector(selectors.price, { timeout: 50000 }); // Wait for the price element, adjust timeout if needed
 
         const result = await page.evaluate((selectors) => {
             const element = document.querySelector(selectors.price);
