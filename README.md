@@ -12,7 +12,7 @@ It scrapes **real-time price data** from selected stores, giving users an up-to-
 
 
 ![ListNGo Screenshot](./View%20recent%20photos%202.png)
-![Ticked Screenshot](./IMG_8559.png)
+![Ticked Screenshot](./IMG_8559.jpg)
 
 
 ---
